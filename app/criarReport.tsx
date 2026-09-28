@@ -11,7 +11,7 @@ const cores = {
   alerta: "#b8860b",
 };
 
-export default function Mapa() {
+export default function CriarReport() {
   const { logado } = useLocalSearchParams<{ logado?: string }>();
   const estaLogado = logado === "true";
 
@@ -25,7 +25,7 @@ export default function Mapa() {
             <Text style={[styles.statusTexto, { color: cores.verde }]}>
               Você está logado
             </Text>
-            <Text style={styles.titulo}>Aqui vai o mapa</Text>
+            <Text style={styles.titulo}>Aqui vai os reportes</Text>
             <Link href="/perfil" asChild>
               <Pressable>
                 <Text style={styles.link}>Perfil do usuário</Text>

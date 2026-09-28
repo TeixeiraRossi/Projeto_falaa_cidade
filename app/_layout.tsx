@@ -27,6 +27,7 @@ export default function RootLayout() {
           options={{ presentation: "modal", title: "Modal" }}
         />
         <Stack.Screen name="mapa" options={{ title: "Mapa dos buracos" }} />
+        <Stack.Screen name="perfil" options={{ title: "Perfil do usuario" }} />
       </Stack>
     </ThemeProvider>
   );

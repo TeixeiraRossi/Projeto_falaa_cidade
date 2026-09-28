@@ -1,9 +1,9 @@
 import GoogleLogo from "@/components/google-logo";
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 
 /**
  * Paleta de cores que será usado no projeto por completo
@@ -18,7 +18,30 @@ const cores = {
   bgBrancoGelo: "#f6f8fa", // fundo geral da tela
   branco: "#ffffff",
 };
+
 export default function HomeScreen() {
+  const [, setlogado] = useState<boolean>(false);
+
+  /**
+   * Função que será chamada quando o usuário clicar no botão de login com Google
+   * Aqui você pode implementar a lógica de autenticação com o Google.
+   */
+  async function handleGoogleLogin() {
+    try {
+      console.log("Login com Google iniciado");
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setlogado(true);
+      router.push({
+        pathname: "/mapa", // Redireciona para a tela de mapa após o login
+        params: { logado: "true" }, // Passa o estado de login como parâmetro
+      });
+    } catch (error) {
+      console.error("Erro ao fazer login com Google:", error);
+      setlogado(false);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logo}>
@@ -29,7 +52,11 @@ export default function HomeScreen() {
         Reporte, acompanhe e confirme a correção de buracos na sua cidade.
       </Text>
 
-      <TouchableOpacity activeOpacity={0.8} style={styles.botao}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.botao}
+        onPress={() => handleGoogleLogin()}
+      >
         <View style={styles.googleIconCircle}>
           <GoogleLogo size={20} />
         </View>
@@ -43,7 +70,7 @@ export default function HomeScreen() {
         //href="/mapa"
         href={{
           pathname: "/mapa",
-          params: { logado: "true" },
+          params: { logado: "false" },
         }}
         asChild
       >
