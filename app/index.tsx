@@ -1,5 +1,7 @@
 import GoogleLogo from "@/components/google-logo";
-import React, { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { useGoogleAuth } from "@/hooks/use-google-auth";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -20,26 +22,36 @@ const cores = {
 };
 
 export default function HomeScreen() {
-  const [, setlogado] = useState<boolean>(false);
+  // `user` vem do Firebase (via AuthProvider) e só deixa de ser null depois
+  // que o login com Google terminar de verdade — não é mais um estado fake local.
+  const { user } = useAuth();
+  // `request` fica null até o client id carregar; `promptAsync` abre a tela/popup
+  // de login do Google; `error` guarda qualquer falha do processo.
+  const { request, promptAsync, error } = useGoogleAuth();
+
+  // Assim que o usuário loga com sucesso no Firebase, o AuthProvider atualiza
+  // `user` (via onAuthStateChanged) e daí sim navegamos pra tela de mapa.
+  useEffect(() => {
+    if (user) {
+      router.push({
+        pathname: "/mapa",
+        params: { logado: "true" },
+      });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("Erro ao fazer login com Google:", error);
+    }
+  }, [error]);
 
   /**
-   * Função que será chamada quando o usuário clicar no botão de login com Google
-   * Aqui você pode implementar a lógica de autenticação com o Google.
+   * Abre o fluxo de login do Google. O resultado (sucesso/erro) é tratado
+   * dentro do hook useGoogleAuth — aqui só disparamos o processo.
    */
-  async function handleGoogleLogin() {
-    try {
-      console.log("Login com Google iniciado");
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      setlogado(true);
-      router.push({
-        pathname: "/mapa", // Redireciona para a tela de mapa após o login
-        params: { logado: "true" }, // Passa o estado de login como parâmetro
-      });
-    } catch (error) {
-      console.error("Erro ao fazer login com Google:", error);
-      setlogado(false);
-    }
+  function handleGoogleLogin() {
+    promptAsync();
   }
 
   return (
@@ -55,6 +67,9 @@ export default function HomeScreen() {
       <TouchableOpacity
         activeOpacity={0.8}
         style={styles.botao}
+        // Sem `request` carregado ainda não tem como abrir o login (client id
+        // não pronto), então o botão fica desabilitado até esse momento.
+        disabled={!request}
         onPress={() => handleGoogleLogin()}
       >
         <View style={styles.googleIconCircle}>
